@@ -24,6 +24,7 @@ namespace Infrastructure
 
             services.AddScoped<IUtilManager, UtilManager>();
             services.AddScoped<IFileManager, FileManager>();
+            services.AddScoped<IExcelManager, SpreadSheetLightManager>();
 
             return services;
 

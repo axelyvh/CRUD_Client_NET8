@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.ClientDto;
 using Application.DTOs.CommonDto;
 using Application.UseCases.ClientUseCase;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -49,6 +50,14 @@ namespace API.Controllers
         {
             var response = await _clientUseCase.InboxAsync(request);
             return Ok(response);
+        }
+
+        [Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
+        [HttpGet("InboxExcel")]
+        public async Task<IActionResult> InboxExcel()
+        {
+            var fileMemory = await _clientUseCase.InboxExcelAsync();
+            return File(fileMemory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Reporte de Clientes.xlsx");
         }
 
     }

@@ -7,6 +7,7 @@ using Application.Utils;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.Extensions.Configuration;
+using System.Data;
 
 namespace Application.UseCases.ClientUseCase
 {
@@ -16,12 +17,14 @@ namespace Application.UseCases.ClientUseCase
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUtilManager _utilManager;
         private readonly IConfiguration _configuration;
+        private readonly IExcelManager _excelManager;
 
-        public ClientUseCase(IUnitOfWork unitOfWork, IUtilManager utilManager, IConfiguration configuration)
+        public ClientUseCase(IUnitOfWork unitOfWork, IUtilManager utilManager, IConfiguration configuration, IExcelManager excelManager)
         {
             _unitOfWork = unitOfWork;
             _utilManager = utilManager;
             _configuration = configuration;
+            _excelManager = excelManager;
         }
 
         public async Task<bool> CreateAsync(ClientCreateRequestDto request)
@@ -116,6 +119,33 @@ namespace Application.UseCases.ClientUseCase
                 item.BirthDateFormat = _utilManager.DateTimeToDateString(item.BirthDate);
             }
             return result;
+        }
+
+        public async Task<MemoryStream> InboxExcelAsync()
+        {
+            var data = await _unitOfWork.ClientRepository.GetInboxAsync();
+
+            DataTable dt = new DataTable();
+
+            //Columns
+            dt.Columns.Add("Id", typeof(string));
+            dt.Columns.Add("Nombre", typeof(string));
+            dt.Columns.Add("Apellidos", typeof(string));
+            dt.Columns.Add("Fecha Nacimiento", typeof(string));
+            dt.Columns.Add("Tipo de Documento", typeof(string));
+            dt.Columns.Add("N° Documento", typeof(string));
+
+            //Body
+            foreach (var emp in data)
+            {
+                emp.BirthDateFormat = _utilManager.DateTimeToDateString(emp.BirthDate);
+                dt.Rows.Add(emp.Id, emp.Name, emp.Lastname, emp.BirthDateFormat, emp.DocumentType, emp.DocumentNumber);
+            }
+
+            var fileStream = _excelManager.Generate(dt, new List<string> {
+                "A1", "B1", "C1", "D1", "E1", "F1"
+            });
+            return fileStream;
         }
 
         public async Task<bool> RemoveAsync(int id)

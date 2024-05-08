@@ -7,6 +7,7 @@ namespace Application.Repositories
 {
     public interface IClientRepository : IGenericAsyncRepository<Client>
     {
+        Task<List<ClientInboxResponseDto>> GetInboxAsync();
         Task<PaginationResponseDto<ClientInboxResponseDto>> GetInboxPaginationAsync(ClientInboxPaginationRequestDto request);
     }
 }

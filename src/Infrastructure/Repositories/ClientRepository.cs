@@ -16,14 +16,22 @@ namespace Infrastructure.Repositories
         private IQueryable<ClientInboxResponseDto> GetInboxQuery()
         {
             return (from c in _context.Clients
+                    where c.State
                     select new ClientInboxResponseDto
                     {
+                        Id = c.Id,
                         Name = c.Name,
                         Lastname = c.Lastname,
                         BirthDate = c.BirthDate,
                         DocumentType = c.DocumentType,
                         DocumentNumber = c.DocumentNumber
                     }).AsQueryable();
+        }
+
+        public async Task<List<ClientInboxResponseDto>> GetInboxAsync()
+        {
+            var dataResult = GetInboxQuery();
+            return await dataResult.ToListAsync();
         }
 
         public async Task<PaginationResponseDto<ClientInboxResponseDto>> GetInboxPaginationAsync(ClientInboxPaginationRequestDto request)

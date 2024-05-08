@@ -10,5 +10,6 @@ namespace Application.UseCases.ClientUseCase
         Task<ClientDetailResponseDto> DetailAsync(int id);
         Task<bool> UpdateAsync(ClientUpdateRequestDto request);
         Task<bool> RemoveAsync(int id);
+        Task<MemoryStream> InboxExcelAsync();
     }
 }
